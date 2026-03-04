@@ -1,0 +1,13 @@
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-3xl font-bold mb-6">Welcome, <%= current_user.display_name.presence || current_user.email %></h1>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Dashboard</h2>
+      <p>Your projects and collaborations will appear here soon.</p>
+      <div class="card-actions justify-end">
+        <%= link_to "Edit Profile", edit_profile_path, class: "btn btn-outline btn-sm" %>
+      </div>
+    </div>
+  </div>
+</div>

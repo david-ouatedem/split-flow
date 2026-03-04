@@ -1,0 +1,58 @@
+<div class="max-w-4xl mx-auto">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex items-center gap-6 mb-6">
+        <div class="avatar placeholder">
+          <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+            <% if @user.avatar.attached? %>
+              <%= image_tag @user.avatar, alt: @user.display_name %>
+            <% else %>
+              <span class="bg-neutral text-neutral-content w-24 h-24 flex items-center justify-center text-3xl">
+                <%= @user.display_name&.first&.upcase || @user.email.first.upcase %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold"><%= @user.display_name.presence || "No display name" %></h1>
+          <% if @user.role.present? %>
+            <span class="badge badge-primary mt-1"><%= @user.role.humanize %></span>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @user.bio.present? %>
+        <div class="mb-4">
+          <h3 class="font-semibold mb-1">Bio</h3>
+          <p><%= @user.bio %></p>
+        </div>
+      <% end %>
+
+      <% if @user.skills.any? %>
+        <div class="mb-4">
+          <h3 class="font-semibold mb-1">Skills</h3>
+          <div class="flex flex-wrap gap-2">
+            <% @user.skills.each do |skill| %>
+              <span class="badge badge-outline"><%= skill %></span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @user.portfolio_urls.present? %>
+        <div class="mb-4">
+          <h3 class="font-semibold mb-1">Portfolio</h3>
+          <ul class="list-disc list-inside">
+            <% @user.portfolio_urls.each do |platform, url| %>
+              <li><%= platform.capitalize %>: <%= link_to url, url, target: "_blank", rel: "noopener", class: "link link-primary" %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="card-actions justify-end">
+        <%= link_to "Edit Profile", edit_profile_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  </div>
+</div>

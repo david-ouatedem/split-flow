@@ -1,0 +1,81 @@
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-3xl font-bold mb-6">Edit Profile</h1>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <%= form_with(model: @user, url: profile_path, method: :patch, class: "space-y-4") do |f| %>
+        <% if @user.errors.any? %>
+          <div class="alert alert-error">
+            <ul>
+              <% @user.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="form-control">
+          <%= f.label :display_name, class: "label" %>
+          <%= f.text_field :display_name, class: "input input-bordered w-full", placeholder: "Your display name" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :bio, class: "label" %>
+          <%= f.text_area :bio, rows: 4, class: "textarea textarea-bordered w-full", placeholder: "Tell us about yourself..." %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :avatar, class: "label" %>
+          <%= f.file_field :avatar, accept: "image/*", class: "file-input file-input-bordered w-full" %>
+          <% if @user.avatar.attached? %>
+            <label class="label"><span class="label-text-alt">Current avatar will be replaced</span></label>
+          <% end %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :role, class: "label" %>
+          <%= f.select :role, User.roles.keys.map { |r| [r.humanize, r] },
+              { include_blank: "Select a role" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control" data-controller="skills-input">
+          <label class="label">Skills</label>
+          <div class="flex flex-wrap gap-2 mb-2" data-skills-input-target="tagContainer">
+            <% @user.skills.each do |skill| %>
+              <span class="badge badge-primary gap-1" data-skills-input-target="tag">
+                <%= skill %>
+                <button type="button" data-action="skills-input#removeSkill" data-skill="<%= skill %>" class="btn btn-ghost btn-xs">&times;</button>
+                <input type="hidden" name="user[skills][]" value="<%= skill %>">
+              </span>
+            <% end %>
+          </div>
+          <select data-action="change->skills-input#addSkill" data-skills-input-target="select" class="select select-bordered w-full">
+            <option value="">Add a skill...</option>
+            <% User::ALLOWED_SKILLS.each do |skill| %>
+              <option value="<%= skill %>" <%= "disabled" if @user.skills.include?(skill) %>><%= skill %></option>
+            <% end %>
+          </select>
+          <input type="hidden" name="user[skills][]" value="">
+        </div>
+
+        <fieldset class="space-y-2">
+          <legend class="label font-semibold">Portfolio Links</legend>
+          <% User::ALLOWED_PLATFORMS.each do |platform| %>
+            <div class="form-control">
+              <label class="label"><span class="label-text"><%= platform.capitalize %></span></label>
+              <input type="url" name="user[portfolio_urls][<%= platform %>]"
+                     value="<%= @user.portfolio_urls[platform] %>"
+                     placeholder="https://..."
+                     class="input input-bordered w-full" />
+            </div>
+          <% end %>
+        </fieldset>
+
+        <div class="form-control mt-6">
+          <%= f.submit "Save Changes", class: "btn btn-primary w-full" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

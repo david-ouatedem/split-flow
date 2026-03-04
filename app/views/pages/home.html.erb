@@ -1,0 +1,17 @@
+<div class="hero min-h-[70vh]">
+  <div class="hero-content text-center">
+    <div class="max-w-lg">
+      <h1 class="text-5xl font-bold">SplitFlow</h1>
+      <p class="py-6 text-lg">
+        The ownership layer for collaborative music production.
+        Organize projects, track contributions, and lock down splits — all in one place.
+      </p>
+      <% if user_signed_in? %>
+        <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-primary btn-lg" %>
+      <% else %>
+        <%= link_to "Get Started", new_user_registration_path, class: "btn btn-primary btn-lg" %>
+        <%= link_to "Log in", new_user_session_path, class: "btn btn-outline btn-lg ml-2" %>
+      <% end %>
+    </div>
+  </div>
+</div>
