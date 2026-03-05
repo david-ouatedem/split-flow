@@ -1,0 +1,37 @@
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-3xl font-bold mb-6">My Invitations</h1>
+
+  <% if @pending_invitations.any? %>
+    <div class="space-y-3">
+      <% @pending_invitations.each do |invitation| %>
+        <%= turbo_frame_tag dom_id(invitation) do %>
+          <div class="card bg-base-100 shadow-sm">
+            <div class="card-body flex-row items-center justify-between py-4">
+              <div>
+                <h3 class="font-semibold"><%= invitation.project.title %></h3>
+                <p class="text-sm text-base-content/70">
+                  Invited by <%= invitation.project.owner.display_name || invitation.project.owner.email %>
+                  <% if invitation.role.present? %>
+                    &middot; Role: <span class="badge badge-ghost badge-sm"><%= invitation.role %></span>
+                  <% end %>
+                </p>
+              </div>
+              <div class="flex gap-2">
+                <%= button_to "Accept", accept_project_collaboration_path(invitation.project, invitation),
+                    method: :patch, class: "btn btn-success btn-sm" %>
+                <%= button_to "Decline", decline_project_collaboration_path(invitation.project, invitation),
+                    method: :patch, class: "btn btn-ghost btn-sm" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body text-center">
+        <p class="text-lg">No pending invitations.</p>
+      </div>
+    </div>
+  <% end %>
+</div>

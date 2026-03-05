@@ -26,6 +26,14 @@
       <div class="flex-none gap-2">
         <% if user_signed_in? %>
           <%= link_to "Dashboard", dashboard_path, class: "btn btn-ghost btn-sm" %>
+          <%= link_to "Projects", projects_path, class: "btn btn-ghost btn-sm" %>
+          <% pending_count = current_user.collaborations.pending.count %>
+          <%= link_to invitations_path, class: "btn btn-ghost btn-sm" do %>
+            Invitations
+            <% if pending_count > 0 %>
+              <span class="badge badge-sm badge-warning"><%= pending_count %></span>
+            <% end %>
+          <% end %>
           <%= link_to "Profile", profile_path, class: "btn btn-ghost btn-sm" %>
           <%= button_to "Log out", destroy_user_session_path, method: :delete, class: "btn btn-ghost btn-sm" %>
         <% else %>

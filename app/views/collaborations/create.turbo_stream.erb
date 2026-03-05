@@ -1,0 +1,7 @@
+<%= turbo_stream.append "collaborators-list" do %>
+  <%= render partial: "collaborations/collaboration", locals: { collaboration: @collaboration, project: @project } %>
+<% end %>
+
+<%= turbo_stream.update "invite_form" do %>
+  <%= render partial: "collaborations/invite_form", locals: { project: @project } %>
+<% end %>

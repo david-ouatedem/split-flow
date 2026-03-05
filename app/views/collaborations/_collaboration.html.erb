@@ -1,0 +1,11 @@
+<div class="flex items-center justify-between py-2" id="<%= dom_id(collaboration) %>">
+  <div>
+    <span class="font-medium"><%= collaboration.user.display_name || collaboration.user.email %></span>
+    <% if collaboration.role.present? %>
+      <span class="badge badge-ghost badge-sm ml-1"><%= collaboration.role %></span>
+    <% end %>
+  </div>
+  <% if project.owned_by?(current_user) %>
+    <%= button_to "Remove", project_collaboration_path(project, collaboration), method: :delete, class: "btn btn-ghost btn-xs text-error" %>
+  <% end %>
+</div>

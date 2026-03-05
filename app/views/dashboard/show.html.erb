@@ -1,11 +1,40 @@
 <div class="max-w-4xl mx-auto">
   <h1 class="text-3xl font-bold mb-6">Welcome, <%= current_user.display_name.presence || current_user.email %></h1>
 
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body items-center text-center">
+        <h2 class="text-3xl font-bold"><%= current_user.owned_projects.count %></h2>
+        <p class="text-base-content/70">Projects</p>
+        <%= link_to "View", projects_path, class: "btn btn-ghost btn-sm" %>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body items-center text-center">
+        <h2 class="text-3xl font-bold"><%= current_user.collaborations.accepted.count %></h2>
+        <p class="text-base-content/70">Collaborations</p>
+        <%= link_to "View", projects_path, class: "btn btn-ghost btn-sm" %>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body items-center text-center">
+        <% pending = current_user.collaborations.pending.count %>
+        <h2 class="text-3xl font-bold"><%= pending %></h2>
+        <p class="text-base-content/70">Pending Invitations</p>
+        <%= link_to "View", invitations_path, class: "btn btn-ghost btn-sm" %>
+      </div>
+    </div>
+  </div>
+
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body">
-      <h2 class="card-title">Dashboard</h2>
-      <p>Your projects and collaborations will appear here soon.</p>
-      <div class="card-actions justify-end">
+      <div class="flex justify-between items-center">
+        <h2 class="card-title">Quick Actions</h2>
+      </div>
+      <div class="flex gap-3 mt-2">
+        <%= link_to "New Project", new_project_path, class: "btn btn-primary btn-sm" %>
         <%= link_to "Edit Profile", edit_profile_path, class: "btn btn-outline btn-sm" %>
       </div>
     </div>

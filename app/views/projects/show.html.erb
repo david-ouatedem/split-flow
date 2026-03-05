@@ -1,0 +1,97 @@
+<div class="max-w-4xl mx-auto">
+  <%# Project Details %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="card-title text-3xl"><%= @project.title %></h1>
+          <p class="text-sm text-base-content/70 mt-1">
+            by <%= @project.owner.display_name || @project.owner.email %>
+          </p>
+        </div>
+        <% if @project.owned_by?(current_user) %>
+          <div class="flex gap-2">
+            <%= link_to "Edit", edit_project_path(@project), class: "btn btn-outline btn-sm" %>
+            <%= button_to "Delete", project_path(@project), method: :delete,
+                data: { turbo_confirm: "Are you sure you want to delete this project?" },
+                class: "btn btn-error btn-outline btn-sm" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mt-3">
+        <span class="badge badge-outline"><%= @project.visibility.gsub("_project", "").capitalize %></span>
+        <span class="badge badge-<%= @project.active? ? 'success' : 'ghost' %>"><%= @project.status.capitalize %></span>
+        <% if @project.genre.present? %>
+          <span class="badge badge-secondary"><%= @project.genre %></span>
+        <% end %>
+        <% if @project.bpm.present? %>
+          <span class="badge badge-ghost"><%= @project.bpm %> BPM</span>
+        <% end %>
+      </div>
+
+      <% if @project.description.present? %>
+        <p class="mt-4"><%= @project.description %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Collaborators %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h2 class="card-title">Collaborators</h2>
+
+      <div id="collaborators-list">
+        <% if @accepted_collaborations.any? %>
+          <% @accepted_collaborations.each do |collaboration| %>
+            <%= render partial: "collaborations/collaboration", locals: { collaboration: collaboration, project: @project } %>
+          <% end %>
+        <% else %>
+          <p class="text-base-content/50 py-2">No collaborators yet.</p>
+        <% end %>
+      </div>
+
+      <% if @project.owned_by?(current_user) %>
+        <%# Pending invitations %>
+        <% if @pending_collaborations&.any? %>
+          <div class="divider">Pending Invitations</div>
+          <% @pending_collaborations.each do |collaboration| %>
+            <div class="flex items-center justify-between py-2" id="<%= dom_id(collaboration) %>">
+              <div>
+                <span class="font-medium"><%= collaboration.user.display_name || collaboration.user.email %></span>
+                <% if collaboration.role.present? %>
+                  <span class="badge badge-ghost badge-sm ml-1"><%= collaboration.role %></span>
+                <% end %>
+                <span class="badge badge-warning badge-sm ml-1">Pending</span>
+              </div>
+              <%= button_to "Remove", project_collaboration_path(@project, collaboration), method: :delete, class: "btn btn-ghost btn-xs" %>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%# Invite form %>
+        <div class="divider">Invite Collaborator</div>
+        <div id="invite_form">
+          <%= render partial: "collaborations/invite_form", locals: { project: @project } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Placeholder sections for future sprints %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Files</h2>
+        <p class="text-base-content/50">File uploads coming in Sprint 3.</p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Split Agreement</h2>
+        <p class="text-base-content/50">Split management coming in Sprint 4.</p>
+      </div>
+    </div>
+  </div>
+</div>

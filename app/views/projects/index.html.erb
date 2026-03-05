@@ -1,0 +1,61 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">My Projects</h1>
+    <%= link_to "New Project", new_project_path, class: "btn btn-primary" %>
+  </div>
+
+  <% if @owned_projects.any? %>
+    <h2 class="text-xl font-semibold mb-3">Owned</h2>
+    <div class="grid gap-4 mb-8">
+      <% @owned_projects.each do |project| %>
+        <%= link_to project_path(project), class: "card bg-base-100 shadow-sm hover:shadow-md transition-shadow" do %>
+          <div class="card-body">
+            <h3 class="card-title"><%= project.title %></h3>
+            <p class="text-sm text-base-content/70 line-clamp-2"><%= project.description %></p>
+            <div class="card-actions justify-start mt-2">
+              <span class="badge badge-outline"><%= project.visibility.gsub("_project", "").capitalize %></span>
+              <span class="badge badge-<%= project.active? ? 'success' : 'ghost' %>"><%= project.status.capitalize %></span>
+              <% if project.genre.present? %>
+                <span class="badge badge-secondary"><%= project.genre %></span>
+              <% end %>
+              <% if project.bpm.present? %>
+                <span class="badge badge-ghost"><%= project.bpm %> BPM</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @collaborating_projects.any? %>
+    <h2 class="text-xl font-semibold mb-3">Collaborations</h2>
+    <div class="grid gap-4">
+      <% @collaborating_projects.each do |project| %>
+        <%= link_to project_path(project), class: "card bg-base-100 shadow-sm hover:shadow-md transition-shadow" do %>
+          <div class="card-body">
+            <h3 class="card-title"><%= project.title %></h3>
+            <p class="text-sm text-base-content/70"><%= project.owner.display_name || project.owner.email %></p>
+            <div class="card-actions justify-start mt-2">
+              <% if project.genre.present? %>
+                <span class="badge badge-secondary"><%= project.genre %></span>
+              <% end %>
+              <span class="badge badge-<%= project.active? ? 'success' : 'ghost' %>"><%= project.status.capitalize %></span>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @owned_projects.empty? && @collaborating_projects.empty? %>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body text-center">
+        <p class="text-lg">You don't have any projects yet.</p>
+        <div class="card-actions justify-center mt-4">
+          <%= link_to "Create your first project", new_project_path, class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

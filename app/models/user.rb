@@ -4,6 +4,10 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
+  has_many :owned_projects, class_name: "Project", foreign_key: :owner_id, dependent: :destroy
+  has_many :collaborations, dependent: :destroy
+  has_many :collaborated_projects, through: :collaborations, source: :project
+
   enum :role, {
     producer:   0,
     beatmaker:  1,
