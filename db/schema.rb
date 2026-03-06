@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_05_214606) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_084919) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,6 +83,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_214606) do
     t.index ["visibility"], name: "index_projects_on_visibility"
   end
 
+  create_table "split_agreements", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "locked_at"
+    t.bigint "project_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.string "verification_token", null: false
+    t.index ["project_id"], name: "index_split_agreements_on_project_id", unique: true
+    t.index ["status"], name: "index_split_agreements_on_status"
+    t.index ["verification_token"], name: "index_split_agreements_on_verification_token", unique: true
+  end
+
+  create_table "split_entries", force: :cascade do |t|
+    t.datetime "approved_at"
+    t.datetime "created_at", null: false
+    t.decimal "percentage", precision: 5, scale: 2, null: false
+    t.bigint "split_agreement_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["approved_at"], name: "index_split_entries_on_approved_at"
+    t.index ["split_agreement_id", "user_id"], name: "index_split_entries_on_split_agreement_id_and_user_id", unique: true
+    t.index ["split_agreement_id"], name: "index_split_entries_on_split_agreement_id"
+    t.index ["user_id"], name: "index_split_entries_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.text "bio"
     t.datetime "created_at", null: false
@@ -109,4 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_214606) do
   add_foreign_key "project_files", "projects"
   add_foreign_key "project_files", "users", column: "uploader_id"
   add_foreign_key "projects", "users", column: "owner_id"
+  add_foreign_key "split_agreements", "projects"
+  add_foreign_key "split_entries", "split_agreements"
+  add_foreign_key "split_entries", "users"
 end

@@ -3,6 +3,8 @@ class Project < ApplicationRecord
   has_many   :collaborations, dependent: :destroy
   has_many   :collaborators, through: :collaborations, source: :user
   has_many   :project_files, dependent: :destroy
+  has_one    :split_agreement, dependent: :destroy
+  has_many   :split_entries, through: :split_agreement
 
   enum :visibility, { private_project: 0, public_project: 1 }
   enum :status, { draft: 0, active: 1, completed: 2, archived: 3 }
@@ -36,6 +38,10 @@ class Project < ApplicationRecord
 
   def accessible_by?(user)
     public_project? || owned_by?(user) || accepted_collaborator?(user)
+  end
+
+  def all_participants
+    [owner] + collaborators.merge(collaborations.accepted)
   end
 
   private

@@ -8,6 +8,8 @@ class User < ApplicationRecord
   has_many :collaborations, dependent: :destroy
   has_many :collaborated_projects, through: :collaborations, source: :project
   has_many :uploaded_files, class_name: "ProjectFile", foreign_key: :uploader_id, dependent: :destroy
+  has_many :split_entries, dependent: :restrict_with_error
+  has_many :split_agreements, through: :split_entries
 
   enum :role, {
     producer:   0,
