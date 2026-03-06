@@ -2,6 +2,7 @@ class Project < ApplicationRecord
   belongs_to :owner, class_name: "User"
   has_many   :collaborations, dependent: :destroy
   has_many   :collaborators, through: :collaborations, source: :user
+  has_many   :project_files, dependent: :destroy
 
   enum :visibility, { private_project: 0, public_project: 1 }
   enum :status, { draft: 0, active: 1, completed: 2, archived: 3 }

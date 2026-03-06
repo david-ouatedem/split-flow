@@ -19,6 +19,7 @@ class ProjectsController < ApplicationController
     @collaborations = @project.collaborations.includes(:user)
     @accepted_collaborations = @collaborations.accepted
     @pending_collaborations = @collaborations.pending if @project.owned_by?(current_user)
+    @project_files = @project.project_files.includes(:uploader, file_attachment: :blob).ordered
   end
 
   def new

@@ -78,20 +78,55 @@
     </div>
   </div>
 
-  <%# Placeholder sections for future sprints %>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
+  <%# Files Section %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <div class="flex items-center justify-between mb-4">
         <h2 class="card-title">Files</h2>
-        <p class="text-base-content/50">File uploads coming in Sprint 3.</p>
+        <% if @project_files.any? %>
+          <%= link_to "Download All (ZIP)",
+              download_all_project_project_files_path(@project),
+              class: "btn btn-outline btn-sm gap-2" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Download All
+          <% end %>
+        <% end %>
+      </div>
+
+      <%# Upload Form %>
+      <% if current_user %>
+        <div class="collapse collapse-arrow bg-base-200 mb-4">
+          <input type="checkbox" />
+          <div class="collapse-title font-medium">
+            Upload New File
+          </div>
+          <div class="collapse-content">
+            <%= render partial: "project_files/upload_form",
+                locals: { project: @project, project_file: @project.project_files.build } %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Files List %>
+      <div id="project-files-list" class="space-y-3">
+        <% if @project_files.any? %>
+          <% @project_files.each do |project_file| %>
+            <%= render partial: "project_files/file", locals: { project_file: project_file } %>
+          <% end %>
+        <% else %>
+          <p class="text-base-content/50 py-4 text-center">No files uploaded yet.</p>
+        <% end %>
       </div>
     </div>
+  </div>
 
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title">Split Agreement</h2>
-        <p class="text-base-content/50">Split management coming in Sprint 4.</p>
-      </div>
+  <%# Split Agreement Placeholder %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h2 class="card-title">Split Agreement</h2>
+      <p class="text-base-content/50">Split management coming in Sprint 4.</p>
     </div>
   </div>
 </div>

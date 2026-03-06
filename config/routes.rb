@@ -14,6 +14,12 @@ Rails.application.routes.draw do
         patch :decline
       end
     end
+
+    resources :project_files, only: [ :create, :destroy ], path: "files" do
+      collection do
+        get :download_all
+      end
+    end
   end
 
   get "invitations", to: "collaborations#invitations"

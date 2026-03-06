@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :owned_projects, class_name: "Project", foreign_key: :owner_id, dependent: :destroy
   has_many :collaborations, dependent: :destroy
   has_many :collaborated_projects, through: :collaborations, source: :project
+  has_many :uploaded_files, class_name: "ProjectFile", foreign_key: :uploader_id, dependent: :destroy
 
   enum :role, {
     producer:   0,

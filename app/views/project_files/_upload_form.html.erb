@@ -1,0 +1,55 @@
+<%= form_with model: project_file, url: project_project_files_path(project), id: "file-upload-form", class: "space-y-4" do |f| %>
+  <% if project_file.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% project_file.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-control">
+    <%= f.label :file, "Select Audio File", class: "label" %>
+    <span class="label-text-alt text-base-content/70 mb-2">Supported: WAV, MP3, FLAC, AIFF, OGG, M4A, ZIP (max 200MB)</span>
+    <%= f.file_field :file,
+        accept: "audio/*,application/zip",
+        required: true,
+        class: "file-input file-input-bordered w-full",
+        data: { action: "change->upload-preview#preview" } %>
+  </div>
+
+  <div class="form-control">
+    <%= f.label :label, "File Label / Role", class: "label" %>
+    <%= f.select :label,
+        options_for_select([
+          ["Drums", "Drums"],
+          ["Bass", "Bass"],
+          ["Lead Melody", "Lead Melody"],
+          ["Chords", "Chords"],
+          ["Vocals", "Vocals"],
+          ["Vocal Recording", "Vocal Recording"],
+          ["Mixing", "Mixing"],
+          ["Mastering", "Mastering"],
+          ["Full Mix", "Full Mix"],
+          ["Stems", "Stems"],
+          ["Project File", "Project File"],
+          ["Other", "Other"]
+        ], project_file.label),
+        { prompt: "Select a label..." },
+        required: true,
+        class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="form-control">
+    <%= f.label :name, "File Name (optional)", class: "label" %>
+    <span class="label-text-alt text-base-content/70 mb-2">Defaults to uploaded filename if left blank</span>
+    <%= f.text_field :name,
+        placeholder: "e.g., Main Beat v2",
+        class: "input input-bordered w-full" %>
+  </div>
+
+  <div class="flex justify-end">
+    <%= f.submit "Upload File", class: "btn btn-primary" %>
+  </div>
+<% end %>
