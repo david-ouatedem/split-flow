@@ -43,16 +43,18 @@
       </div>
     </div>
 
-    <% if notice %>
-      <div class="alert alert-success mx-auto mt-4 max-w-4xl" data-controller="flash">
-        <span><%= notice %></span>
-      </div>
-    <% end %>
-    <% if alert %>
-      <div class="alert alert-error mx-auto mt-4 max-w-4xl" data-controller="flash">
-        <span><%= alert %></span>
-      </div>
-    <% end %>
+    <div id="flash">
+      <% if notice %>
+        <div class="alert alert-success mx-auto mt-4 max-w-4xl" data-controller="flash">
+          <span><%= notice %></span>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div class="alert alert-error mx-auto mt-4 max-w-4xl" data-controller="flash">
+          <span><%= alert %></span>
+        </div>
+      <% end %>
+    </div>
 
     <main class="container mx-auto mt-8 px-5">
       <%= yield %>

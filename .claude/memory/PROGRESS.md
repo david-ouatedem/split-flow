@@ -22,11 +22,10 @@ Full spec: `splitflow_mvp_spec_v2.docx` in project root.
 | 1 (2 wks) | Foundation: Devise auth, profiles, DB schema | COMPLETE |
 | 2 (2 wks) | Projects: CRUD, invitations, collaborator management, access control | COMPLETE |
 | 3 (2 wks) | Files: ActiveStorage uploads to R2, versioning, labeling, ZIP download | COMPLETE |
-| 4 (2 wks) | Splits (Core): proposal, approval flow, locking, PDF export | NOT STARTED |
-| 5 (1 wk)  | Verification: public verification links, shareable agreement pages | NOT STARTED |
-| 6 (1 wk)  | Communication: project threads, file comments, activity feed | NOT STARTED |
-| 7 (1 wk)  | Polish: UI, error handling, email notifications, testing | NOT STARTED |
-| 8 (1 wk)  | Launch Prep: Docker Compose prod, Nginx+SSL, CI/CD, monitoring | NOT STARTED |
+| 4 (2 wks) | Splits (Core): proposal, approval flow, locking, PDF export, verification | COMPLETE |
+| 5 (1 wk)  | Communication: project threads, file comments, activity feed | NOT STARTED |
+| 6 (1 wk)  | Polish: UI, error handling, email notifications, testing | NOT STARTED |
+| 7 (1 wk)  | Launch Prep: Docker Compose prod, Nginx+SSL, CI/CD, monitoring | NOT STARTED |
 
 ## Sprint 2 Deliverables
 - **Project model:** title, description, genre, bpm, visibility (private/public enum), status (draft/active/completed/archived enum), owner_id FK
@@ -63,14 +62,32 @@ Full spec: `splitflow_mvp_spec_v2.docx` in project root.
 - **Project:** title, description, genre, bpm, visibility, status → belongs_to :owner (User), has_many :collaborations, :collaborators, :project_files
 - **Collaboration:** user_id, project_id, role, status → belongs_to :user, :project
 - **ProjectFile:** name, label, version, project_id, uploader_id + has_one_attached :file → belongs_to :project, :uploader (User)
+- **SplitAgreement:** project_id (unique), status (enum: draft/pending/locked), locked_at, verification_token → belongs_to :project, has_many :split_entries, :participants (through)
+- **SplitEntry:** split_agreement_id, user_id, percentage (decimal 5,2), approved_at → belongs_to :split_agreement, :user
+
+## Sprint 4 Deliverables
+- **SplitAgreement model:** project_id (unique), status (draft/pending/locked enum), locked_at, verification_token (unique, 256-bit)
+- **SplitEntry model:** split_agreement_id, user_id (unique per agreement), percentage (decimal 5,2), approved_at
+- **State machine:** draft → pending (on propose, auto-approves owner) → locked (auto-lock when all approved + total=100%)
+- **Immutability:** locked agreements cannot be modified (model validation + controller guard)
+- **SplitAgreementsController:** show, new, create, edit, update, propose, export_pdf, verify (public)
+- **SplitEntriesController:** approve action with authorization (only own entry)
+- **Authorization:** ProjectAuthorization concern — owner-only for create/edit/propose, all collaborators for view/approve
+- **Routes:** nested under projects as `/projects/:id/splits`, public verify at `/verify/:verification_token`
+- **Views:** agreement_card partial (conditional rendering for all states), entries_table, entry_row with approve button, form with Stimulus-powered live total calculation
+- **Full page views:** new, edit, show (with propose button, PDF download, verification link share)
+- **Turbo Streams:** create, update, propose, approve — all replace `#split-agreement-section` + prepend flash
+- **Stimulus controllers:** split-calculator (live percentage total with green/red feedback), clipboard (copy verification URL)
+- **PDF generation:** Prawn-based SplitAgreementPdfGenerator service with header, project details, split distribution table, approval record, agreement metadata, public verification URL footer
+- **Public verification:** minimal layout (no auth nav), verify page with full agreement details, verify_not_found error page
+- **Dependencies:** prawn ~> 2.5, prawn-table ~> 0.2.2
+- **Layout update:** added `#flash` wrapper div to application layout for Turbo Stream flash injection
 
 ## Key Data Models (not yet implemented)
-- SplitAgreement: project_id, status (draft/pending/locked), locked_at
-- SplitEntry: agreement_id, user_id, percentage, approved_at
 - Comment: body, commentable_type/id (polymorphic: project or file)
 
 ## Current Step
-Sprint 3 complete — next: Sprint 4 (Split agreements: proposal, approval flow, locking, PDF export)
+Sprint 4 complete — next: Sprint 5 (Communication: project threads, file comments, activity feed)
 
 ## Important Decisions
 - Claude Code must NOT add "Co-Authored-By" to commits (via `.claude/settings.local.json`)
@@ -86,3 +103,10 @@ Sprint 3 complete — next: Sprint 4 (Split agreements: proposal, approval flow,
 - 200MB file size limit enforced at model level
 - Local disk storage for development, Cloudflare R2 for production (S3-compatible)
 - Only uploader or project owner can delete files (enforced in controller)
+- Split agreements: one per project (uniqueness constraint), uses pessimistic locking for auto-lock to prevent race conditions
+- Owner's entry auto-approved on propose (owner has already reviewed/set all percentages)
+- Percentage validation range 99.99-100.01 to handle floating point rounding
+- Verification tokens: SecureRandom.urlsafe_base64(32) with loop-until-unique generation
+- PDF generation uses Prawn gem (not wkhtmltopdf) for zero external dependency
+- Public verification pages use separate layout with noindex meta tag
+- Merged Sprint 5 (Verification) into Sprint 4 since verification is integral to split agreements

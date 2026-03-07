@@ -1,0 +1,37 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="mb-6">
+    <%= link_to project_path(@project), class: "btn btn-ghost btn-sm" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to Project
+    <% end %>
+  </div>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h1 class="card-title text-3xl mb-2">Create Split Agreement</h1>
+      <p class="text-base-content/70 mb-6">
+        Set revenue split percentages for all project participants. Total must equal 100%.
+      </p>
+
+      <%= render "form", agreement: @agreement, project: @project %>
+    </div>
+  </div>
+
+  <div class="alert alert-info mt-6">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div>
+      <div class="font-semibold">How Split Agreements Work</div>
+      <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+        <li>Create a draft agreement and set percentages for each participant</li>
+        <li>Once percentages total 100%, propose the agreement to collaborators</li>
+        <li>Each collaborator must approve their percentage share</li>
+        <li>Agreement automatically locks when all participants approve</li>
+        <li>Locked agreements are immutable and can be exported as PDF</li>
+      </ul>
+    </div>
+  </div>
+</div>

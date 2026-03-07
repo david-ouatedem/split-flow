@@ -1,0 +1,153 @@
+<div class="container mx-auto px-4 py-8 max-w-5xl">
+  <div class="mb-6">
+    <%= link_to project_path(@project), class: "btn btn-ghost btn-sm" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to Project
+    <% end %>
+  </div>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="card-title text-3xl"><%= @project.title %> - Split Agreement</h1>
+          <p class="text-base-content/70 mt-2">Revenue split distribution for all participants</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <% if @agreement.draft? %>
+            <span class="badge badge-warning badge-lg">Draft</span>
+          <% elsif @agreement.pending? %>
+            <span class="badge badge-info badge-lg">Pending Approval</span>
+          <% elsif @agreement.locked? %>
+            <span class="badge badge-success badge-lg">Locked</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%= render "entries_table", agreement: @agreement, entries: @entries %>
+
+      <div class="divider"></div>
+
+      <div class="flex gap-3 justify-between items-center">
+        <div>
+          <% if @agreement.draft? %>
+            <%= link_to edit_project_split_agreement_path(@project), class: "btn btn-primary" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              Edit Percentages
+            <% end %>
+
+            <% if @agreement.valid_percentages? %>
+              <%= button_to propose_project_split_agreement_path(@project), method: :patch, class: "btn btn-success" do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Propose to Collaborators
+              <% end %>
+            <% else %>
+              <button class="btn btn-disabled" disabled>
+                Propose (Total must = 100%)
+              </button>
+            <% end %>
+          <% elsif @agreement.pending? %>
+            <div class="alert alert-info">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>Awaiting approval from all participants. Agreement will lock automatically when everyone approves.</span>
+            </div>
+          <% elsif @agreement.locked? %>
+            <div class="alert alert-success">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <div class="font-semibold">Agreement Locked</div>
+                <div class="text-sm">Locked on <%= @agreement.locked_at.strftime("%B %d, %Y at %I:%M %p") %></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="flex gap-2">
+          <% if @agreement.locked? %>
+            <%= link_to export_pdf_project_split_agreement_path(@project), class: "btn btn-primary" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              Download PDF
+            <% end %>
+
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+                Share
+              </div>
+              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-72 p-2 shadow-lg border border-base-300">
+                <li class="menu-title">Verification Link</li>
+                <li>
+                  <div class="flex items-center gap-2">
+                    <input type="text"
+                           readonly
+                           value="<%= verify_split_agreement_url(@agreement.verification_token) %>"
+                           class="input input-sm input-bordered flex-1 text-xs"
+                           data-controller="clipboard"
+                           data-clipboard-target="source">
+                    <button class="btn btn-sm btn-primary"
+                            data-controller="clipboard"
+                            data-action="clipboard#copy">
+                      Copy
+                    </button>
+                  </div>
+                </li>
+                <li class="text-xs text-base-content/70 px-4 py-2">
+                  Anyone with this link can verify the agreement details
+                </li>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @agreement.pending? %>
+        <div class="divider">Pending Approvals</div>
+        <div class="space-y-3">
+          <% @entries.pending_approval.each do |entry| %>
+            <%= render "split_entries/entry_row", entry: entry, project: @project %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @agreement.locked? %>
+    <div class="card bg-base-200 mt-6">
+      <div class="card-body">
+        <h3 class="card-title text-lg">Agreement Details</h3>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="font-semibold">Status:</span>
+            <span class="text-success">Locked & Immutable</span>
+          </div>
+          <div>
+            <span class="font-semibold">Locked At:</span>
+            <%= @agreement.locked_at.strftime("%B %d, %Y at %I:%M %p") %>
+          </div>
+          <div>
+            <span class="font-semibold">Total Participants:</span>
+            <%= @entries.count %>
+          </div>
+          <div>
+            <span class="font-semibold">Verification Token:</span>
+            <code class="text-xs"><%= @agreement.verification_token[0..15] %>...</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

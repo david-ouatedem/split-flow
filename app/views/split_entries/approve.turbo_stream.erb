@@ -1,0 +1,16 @@
+<% @agreement.reload %>
+
+<%= turbo_stream.replace "split-agreement-section" do %>
+  <%= render partial: "split_agreements/agreement_card",
+      locals: { project: @project, agreement: @agreement } %>
+<% end %>
+
+<%= turbo_stream.prepend "flash" do %>
+  <div class="alert alert-success mx-auto mt-4 max-w-4xl" data-controller="flash">
+    <% if @agreement.locked? %>
+      <span>All participants approved! Agreement is now locked.</span>
+    <% else %>
+      <span>You have approved your split percentage of <%= number_with_precision(@entry.percentage, precision: 2) %>%.</span>
+    <% end %>
+  </div>
+<% end %>

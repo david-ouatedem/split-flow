@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html data-theme="light">
+  <head>
+    <title>Verify Split Agreement - SplitFlow</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-base-200">
+    <div class="navbar bg-base-100 shadow-sm">
+      <div class="flex-1">
+        <span class="text-xl font-bold px-4">SplitFlow</span>
+      </div>
+      <div class="flex-none">
+        <span class="text-sm text-base-content/60 px-4">Public Verification</span>
+      </div>
+    </div>
+
+    <main class="container mx-auto mt-8 px-5">
+      <%= yield %>
+    </main>
+
+    <footer class="footer footer-center p-6 mt-12 text-base-content/50">
+      <p class="text-sm">
+        SplitFlow — Collaborative split agreements for music producers
+      </p>
+    </footer>
+  </body>
+</html>

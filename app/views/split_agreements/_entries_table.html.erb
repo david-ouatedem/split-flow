@@ -1,0 +1,59 @@
+<div class="overflow-x-auto">
+  <table class="table table-zebra">
+    <thead>
+      <tr>
+        <th>Participant</th>
+        <th>Email</th>
+        <th>Percentage</th>
+        <% if agreement.pending? || agreement.locked? %>
+          <th>Status</th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% entries.each do |entry| %>
+        <tr id="<%= dom_id(entry) %>">
+          <td>
+            <div class="flex items-center gap-2">
+              <div class="font-medium"><%= entry.user.display_name || entry.user.email.split('@').first %></div>
+              <% if entry.user == agreement.project.owner %>
+                <span class="badge badge-sm badge-primary">Owner</span>
+              <% end %>
+            </div>
+          </td>
+          <td class="text-sm text-base-content/70"><%= entry.user.email %></td>
+          <td>
+            <span class="font-bold text-lg"><%= number_with_precision(entry.percentage, precision: 2) %>%</span>
+          </td>
+          <% if agreement.pending? || agreement.locked? %>
+            <td>
+              <% if entry.approved? %>
+                <div class="flex items-center gap-2 text-success">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span class="text-sm">Approved</span>
+                </div>
+              <% else %>
+                <span class="badge badge-warning">Pending</span>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr class="font-bold">
+        <td colspan="2">Total</td>
+        <td>
+          <span class="text-lg <%= agreement.valid_percentages? ? 'text-success' : 'text-error' %>">
+            <%= number_with_precision(agreement.total_percentage, precision: 2) %>%
+          </span>
+        </td>
+        <% if agreement.pending? || agreement.locked? %>
+          <td></td>
+        <% end %>
+      </tr>
+    </tfoot>
+  </table>
+</div>

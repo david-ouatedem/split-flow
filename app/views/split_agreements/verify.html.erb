@@ -1,0 +1,146 @@
+<div class="max-w-4xl mx-auto">
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h1 class="card-title text-3xl">Split Agreement Verification</h1>
+          <p class="text-base-content/70 mt-1">
+            Independent verification of revenue split agreement
+          </p>
+        </div>
+
+        <% if @agreement.locked? %>
+          <span class="badge badge-success badge-lg gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Verified & Locked
+          </span>
+        <% elsif @agreement.pending? %>
+          <span class="badge badge-warning badge-lg">Pending Approval</span>
+        <% else %>
+          <span class="badge badge-ghost badge-lg">Draft</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Project Info %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-lg mb-3">Project Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <span class="text-sm text-base-content/60">Project</span>
+          <p class="font-semibold"><%= @project.title %></p>
+        </div>
+        <div>
+          <span class="text-sm text-base-content/60">Owner</span>
+          <p class="font-semibold"><%= @project.owner.display_name || @project.owner.email %></p>
+        </div>
+        <% if @project.genre.present? %>
+          <div>
+            <span class="text-sm text-base-content/60">Genre</span>
+            <p class="font-semibold"><%= @project.genre %></p>
+          </div>
+        <% end %>
+        <% if @project.bpm.present? %>
+          <div>
+            <span class="text-sm text-base-content/60">BPM</span>
+            <p class="font-semibold"><%= @project.bpm %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Split Distribution %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-lg mb-3">Split Distribution</h2>
+
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Participant</th>
+              <th>Email</th>
+              <th class="text-right">Percentage</th>
+              <th>Status</th>
+              <th>Approved At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @entries.each do |entry| %>
+              <tr>
+                <td class="font-semibold">
+                  <%= entry.user.display_name || entry.user.email.split("@").first %>
+                  <% if entry.user == @project.owner %>
+                    <span class="badge badge-sm badge-primary ml-1">Owner</span>
+                  <% end %>
+                </td>
+                <td class="text-base-content/70"><%= entry.user.email %></td>
+                <td class="text-right font-mono font-bold"><%= number_with_precision(entry.percentage, precision: 2) %>%</td>
+                <td>
+                  <% if entry.approved? %>
+                    <span class="badge badge-success badge-sm">Approved</span>
+                  <% else %>
+                    <span class="badge badge-warning badge-sm">Pending</span>
+                  <% end %>
+                </td>
+                <td class="text-sm text-base-content/60">
+                  <%= entry.approved_at&.strftime("%b %d, %Y %I:%M %p") || "—" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr class="font-bold">
+              <td colspan="2">Total</td>
+              <td class="text-right font-mono"><%= number_with_precision(@agreement.total_percentage, precision: 2) %>%</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <%# Agreement Metadata %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-lg mb-3">Agreement Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="text-base-content/60">Status</span>
+          <p class="font-semibold">
+            <% if @agreement.locked? %>
+              <span class="text-success">Locked & Immutable</span>
+            <% else %>
+              <%= @agreement.status.capitalize %>
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <span class="text-base-content/60">Created</span>
+          <p class="font-semibold"><%= @agreement.created_at.strftime("%B %d, %Y at %I:%M %p UTC") %></p>
+        </div>
+        <% if @agreement.locked_at %>
+          <div>
+            <span class="text-base-content/60">Locked At</span>
+            <p class="font-semibold"><%= @agreement.locked_at.strftime("%B %d, %Y at %I:%M %p UTC") %></p>
+          </div>
+        <% end %>
+        <div>
+          <span class="text-base-content/60">Participants</span>
+          <p class="font-semibold"><%= @entries.count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center text-sm text-base-content/50 mt-8">
+    <p>This is an independently verifiable record of a split agreement on SplitFlow.</p>
+    <p class="mt-1">Verification Token: <code class="text-xs"><%= @agreement.verification_token %></code></p>
+  </div>
+</div>

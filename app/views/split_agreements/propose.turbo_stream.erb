@@ -1,0 +1,10 @@
+<%= turbo_stream.replace "split-agreement-section" do %>
+  <%= render partial: "split_agreements/agreement_card",
+      locals: { project: @project, agreement: @agreement } %>
+<% end %>
+
+<%= turbo_stream.prepend "flash" do %>
+  <div class="alert alert-success mx-auto mt-4 max-w-4xl" data-controller="flash">
+    <span>Split agreement proposed! Awaiting collaborator approvals.</span>
+  </div>
+<% end %>

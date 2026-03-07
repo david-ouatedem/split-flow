@@ -20,6 +20,7 @@ class ProjectsController < ApplicationController
     @accepted_collaborations = @collaborations.accepted
     @pending_collaborations = @collaborations.pending if @project.owned_by?(current_user)
     @project_files = @project.project_files.includes(:uploader, file_attachment: :blob).ordered
+    @split_agreement = @project.split_agreement
   end
 
   def new

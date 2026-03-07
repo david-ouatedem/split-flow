@@ -1,0 +1,122 @@
+<%= form_with model: [:project, agreement], id: "split-agreement-form", class: "space-y-6",
+    data: { controller: "split-calculator", action: "input->split-calculator#calculate" } do |f| %>
+
+  <% if agreement.errors.any? %>
+    <div class="alert alert-error">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <div class="font-semibold">Error creating agreement</div>
+        <ul class="list-disc list-inside text-sm">
+          <% agreement.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="alert alert-info">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span>Set the revenue split percentage for each participant. Total must equal 100%.</span>
+  </div>
+
+  <div class="space-y-3">
+    <% if agreement.new_record? %>
+      <%# New Agreement - use built entries %>
+      <% agreement.split_entries.each do |entry| %>
+        <div class="card bg-base-200 border border-base-300">
+          <div class="card-body py-4 px-6">
+            <div class="flex items-center gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold"><%= entry.user.display_name || entry.user.email.split('@').first %></span>
+                  <% if entry.user == project.owner %>
+                    <span class="badge badge-sm badge-primary">Owner</span>
+                  <% end %>
+                </div>
+                <div class="text-sm text-base-content/70"><%= entry.user.email %></div>
+              </div>
+
+              <div class="form-control w-32">
+                <%= fields_for "split_entries[#{entry.user_id}]" do |entry_fields| %>
+                  <div class="join">
+                    <%= entry_fields.number_field :percentage,
+                        value: entry.percentage == 0 ? nil : entry.percentage,
+                        step: 0.01,
+                        min: 0,
+                        max: 100,
+                        placeholder: "0.00",
+                        class: "input input-bordered join-item w-full text-right",
+                        data: { split_calculator_target: "percentage" } %>
+                    <span class="btn btn-disabled join-item">%</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <%# Existing Agreement - use persisted entries %>
+      <% @entries.each do |entry| %>
+        <div class="card bg-base-200 border border-base-300">
+          <div class="card-body py-4 px-6">
+            <div class="flex items-center gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold"><%= entry.user.display_name || entry.user.email.split('@').first %></span>
+                  <% if entry.user == project.owner %>
+                    <span class="badge badge-sm badge-primary">Owner</span>
+                  <% end %>
+                </div>
+                <div class="text-sm text-base-content/70"><%= entry.user.email %></div>
+              </div>
+
+              <div class="form-control w-32">
+                <%= fields_for "split_entries[#{entry.id}]" do |entry_fields| %>
+                  <div class="join">
+                    <%= entry_fields.number_field :percentage,
+                        value: entry.percentage,
+                        step: 0.01,
+                        min: 0,
+                        max: 100,
+                        class: "input input-bordered join-item w-full text-right",
+                        data: { split_calculator_target: "percentage" } %>
+                    <span class="btn btn-disabled join-item">%</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="card bg-primary text-primary-content">
+    <div class="card-body py-4 px-6">
+      <div class="flex items-center justify-between">
+        <span class="font-semibold text-lg">Total Percentage</span>
+        <span class="text-3xl font-bold"
+              data-split-calculator-target="total"
+              data-split-calculator-valid-class="text-success"
+              data-split-calculator-invalid-class="text-error">
+          0.00%
+        </span>
+      </div>
+      <div class="text-sm opacity-90" data-split-calculator-target="message">
+        Total must equal 100% to propose agreement
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-3 justify-end">
+    <%= link_to "Cancel", project_path(project), class: "btn btn-ghost" %>
+    <%= f.submit agreement.new_record? ? "Create Draft" : "Save Changes",
+        class: "btn btn-primary" %>
+  </div>
+<% end %>
