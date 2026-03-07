@@ -1,4 +1,6 @@
-<%= form_with model: [:project, agreement], id: "split-agreement-form", class: "space-y-6",
+<%= form_with url: project_split_agreement_path(project),
+    method: agreement.new_record? ? :post : :patch,
+    id: "split-agreement-form", class: "space-y-6",
     data: { controller: "split-calculator", action: "input->split-calculator#calculate" } do |f| %>
 
   <% if agreement.errors.any? %>

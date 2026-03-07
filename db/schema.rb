@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_084919) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_07_124455) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,6 +114,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_084919) do
     t.string "display_name"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.datetime "invitation_accepted_at"
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.string "invitation_token"
+    t.bigint "invited_by_id"
+    t.string "invited_by_type"
     t.jsonb "portfolio_urls", default: {}
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
@@ -122,6 +128,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_084919) do
     t.string "skills", default: [], array: true
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
     t.index ["portfolio_urls"], name: "index_users_on_portfolio_urls", using: :gin
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["skills"], name: "index_users_on_skills", using: :gin

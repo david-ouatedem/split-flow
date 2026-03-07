@@ -7,11 +7,21 @@ class CollaborationsController < ApplicationController
   before_action :set_collaboration, only: [ :accept, :decline ]
 
   def create
-    user = User.find_by(email: collaboration_params[:email])
+    email = collaboration_params[:email]&.downcase&.strip
+    user = User.find_by(email: email)
+    newly_invited = false
 
     if user.nil?
-      redirect_to @project, alert: "No user found with that email."
-      return
+      # Create stub user via devise_invitable
+      user = User.invite!({ email: email }, current_user) do |u|
+        u.skip_invitation = true
+      end
+      newly_invited = true
+
+      unless user.persisted?
+        redirect_to @project, alert: "Could not send invitation: #{user.errors.full_messages.to_sentence}"
+        return
+      end
     end
 
     if user.id == @project.owner_id
@@ -26,6 +36,8 @@ class CollaborationsController < ApplicationController
     )
 
     if @collaboration.save
+      send_invitation_email(user, newly_invited)
+
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to @project, notice: "Invitation sent to #{user.display_name || user.email}." }
@@ -87,5 +99,22 @@ class CollaborationsController < ApplicationController
 
   def collaboration_params
     params.require(:collaboration).permit(:email, :role)
+  end
+
+  def send_invitation_email(user, newly_invited)
+    # Only send email to users who haven't registered yet
+    return if user.invitation_accepted?
+    return unless newly_invited || user.created_by_invite?
+
+    # Re-generate invitation token for pre-existing stub users
+    unless newly_invited
+      user.invite!(current_user) do |u|
+        u.skip_invitation = true
+      end
+    end
+
+    CollaborationInvitationMailer.invite_to_project(
+      user.id, @project.id, current_user.id, user.raw_invitation_token
+    ).deliver_later
   end
 end

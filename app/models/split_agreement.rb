@@ -12,7 +12,7 @@ class SplitAgreement < ApplicationRecord
   validate :all_entries_must_be_approved, if: :locked?
 
   # Callbacks
-  before_create :generate_verification_token
+  before_validation :generate_verification_token, on: :create
   before_update :set_locked_at, if: :will_save_change_to_status_to_locked?
 
   # Instance methods

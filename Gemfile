@@ -22,6 +22,7 @@ gem "bcrypt", "~> 3.1.7"
 
 # Authentication [https://github.com/heartcombo/devise]
 gem "devise", "~> 5.0"
+gem "devise_invitable", "~> 2.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -67,4 +68,7 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Preview emails in browser instead of sending
+  gem "letter_opener"
 end

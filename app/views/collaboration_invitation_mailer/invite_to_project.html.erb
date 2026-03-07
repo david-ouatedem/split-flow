@@ -1,0 +1,23 @@
+<h2>You've been invited to collaborate!</h2>
+
+<p>
+  <strong><%= @inviter.display_name.presence || @inviter.email %></strong> has invited you
+  to collaborate on the project "<strong><%= @project.title %></strong>" on SplitFlow.
+</p>
+
+<% if @project.description.present? %>
+  <p style="color: #666; font-style: italic;"><%= truncate(@project.description, length: 200) %></p>
+<% end %>
+
+<p>
+  SplitFlow is a collaborative platform for music producers to manage projects,
+  share files, and handle split agreements.
+</p>
+
+<p>
+  <strong><%= link_to "Accept Invitation & Set Your Password", @invitation_url %></strong>
+</p>
+
+<p style="color: #999; font-size: 12px;">
+  This invitation will expire in 2 weeks. If you don't want to accept, simply ignore this email.
+</p>
