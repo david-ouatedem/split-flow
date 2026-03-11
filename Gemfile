@@ -45,7 +45,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # ZIP file generation for project file downloads
-gem "rubyzip", "~> 2.3"
+gem "rubyzip", "~> 3.2"
 
 # PDF generation for split agreements
 gem "prawn", "~> 2.5"
